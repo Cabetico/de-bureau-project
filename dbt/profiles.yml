@@ -10,3 +10,6 @@ bureau_project:
       keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}" #<here should be replace with the path to your service account key file>
       location: US
       threads: 4
+
+
+      
