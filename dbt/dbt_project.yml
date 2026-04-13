@@ -1,0 +1,24 @@
+name: bureau_project
+profile: bureau_project
+
+models:
+  bureau_project:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+seeds:
+  bureau_project:
+    +schema: seeds
+    offices:
+      +column_types:
+        office_id:    string
+        state:        string
+        municipality: string
+        office_name:  string

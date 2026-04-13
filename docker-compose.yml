@@ -1,0 +1,87 @@
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Bureau Project — Docker Compose (uv-based services)
+#
+# Usage:
+#   docker compose build
+#   docker compose run ingestion
+#   docker compose run dbt dbt debug
+#   docker compose run dbt dbt run
+#   docker compose run dbt dbt run --select staging
+#   docker compose run dbt dbt test
+#   docker compose run dbt dbt source freshness
+#
+# Exec into a running container:
+#   docker exec -it bureau-ingestion bash
+#   docker exec -it bureau-dbt bash
+# ─────────────────────────────────────────────────────────────────────────────
+ 
+# Reusable env block — referenced with <<: *gcp-env in each service.
+# x- prefix tells Docker Compose this is a custom extension (ignored at runtime).
+# &gcp-env is a YAML anchor — acts like a named variable for the block below it.
+x-gcp-env: &gcp-env
+  GOOGLE_APPLICATION_CREDENTIALS: /secrets/credentials.json
+  GCP_PROJECT: ${GCP_PROJECT}
+
+ 
+services:
+ 
+  # ── Ingestion: GCS ZIP → BigQuery (dlt) ──────────────────────────────────
+  ingestion:
+    container_name: bureau-ingestion      # fixed name for docker exec / logs
+    build:
+      context: ./ingestion
+      dockerfile: Dockerfile
+    environment:
+      <<: *gcp-env                        # merges the gcp-env block defined above
+      GCS_ZIP_URL: ${GCS_ZIP_URL}
+      DISPOSITION: ${DISPOSITION:-replace}
+      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
+      SECRETS_PATH: ${SECRETS_PATH}
+    volumes:
+      - ${CREDENTIALS_PATH}:/secrets/credentials.json:ro
+    command: sleep infinity  # override default to keep container running for exec 
+      
+ 
+  # ── dbt: buro → buro_staging / buro_intermediate / buro_marts ────────────
+  dbt:
+    container_name: bureau-dbt            # fixed name for docker exec / logs
+    build:
+      context: ./dbt
+      dockerfile: Dockerfile
+    environment:
+      <<: *gcp-env
+      DBT_PROFILES_DIR: /dbt
+      DBT_PROJECT_DIR: /dbt
+    volumes:
+      - ${CREDENTIALS_PATH}:/secrets/credentials.json:ro
+      - ./dbt:/dbt                        # live-mount — sql/yml edits work without rebuild
+    working_dir: /dbt
+    command: sleep infinity ##dbt run
+
+# ── Streamlit: BI Dashboard for Bureau Data ──────────────────────────────
+  streamlit:
+    container_name: bureau-streamlit      # fixed name for docker exec / logs
+    build:
+      context: ./streamlit
+      dockerfile: Dockerfile
+    environment:
+      <<: *gcp-env                        # merges the gcp-env block defined above
+      STREAMLIT_PASSWORD: ${STREAMLIT_PASSWORD}
+    volumes:
+      - ${CREDENTIALS_PATH}:/secrets/credentials.json:ro
+      - ./streamlit:/app                  # live-mount — python edits work without rebuild
+    ports:
+      - "8501:8501"                       # Expose Streamlit on localhost:8501
+    working_dir: /app
+    depends_on:
+      - dbt                               # Optional: ensure dbt has run first
+    # command is set in Dockerfile, but can override here if needed
+    # command: uv run streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+
+# ------------------
+# # ingestar_circulo_credito.py
+      #   --zip         ${GCS_ZIP_URL}
+      #   --project     ${GCP_PROJECT}
+      #   --disposition ${DISPOSITION:-replace}
+# #

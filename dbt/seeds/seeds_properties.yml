@@ -1,0 +1,5 @@
+seeds:
+  - name: offices
+    description: "A table containing information about the offices of the company."
+    
+  

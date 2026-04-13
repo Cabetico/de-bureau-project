@@ -1,0 +1,12 @@
+# dbt/profile.yml
+bureau_project:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT') }}" #<here should be replace with your project id>
+      dataset: buro_staging
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}" #<here should be replace with the path to your service account key file>
+      location: US
+      threads: 4

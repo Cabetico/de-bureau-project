@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Streamlit BI Dashboard — pyproject.toml (uv package manager)
+# ─────────────────────────────────────────────────────────────────────────────
+ 
+[project]
+name = "bureau-streamlit"
+version = "0.1.0"
+description = "BI Dashboard for Bureau Credit Data"
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit>=1.28.0",
+    "pandas>=2.0.0",
+    "google-cloud-bigquery>=3.11.0",
+    "plotly>=5.17.0",
+    "google-auth>=2.23.0",
+    "db-dtypes>=1.1.1",
+    "folium>=0.15.0",
+    "streamlit-folium>=0.15.0",
+    "requests>=2.31.0",
+]
+ 
