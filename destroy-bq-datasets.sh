@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_ID="${GCP_PROJECT:-dtc-de-340821}"
+PROJECT_ID="${GCP_PROJECT}"
 
 # Activate service account if credentials file exists
 if [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
