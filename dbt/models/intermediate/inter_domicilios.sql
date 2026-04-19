@@ -1,9 +1,9 @@
 with domicilios as (
-    select * from {{ source('staging', 'stg_domicilios') }}   
+    select * from {{ ref('stg_domicilios') }}   
 ),
 
 applications as (
-    select * from {{ source('staging', 'stg_applications') }}
+    select * from {{ ref('stg_applications') }}
 ),
 
 enriched as (

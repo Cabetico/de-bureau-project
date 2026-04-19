@@ -1,3 +1,6 @@
 .gcp
 .env
 shadow_readme.md
+**/__pycache__/
+/target
+/logs

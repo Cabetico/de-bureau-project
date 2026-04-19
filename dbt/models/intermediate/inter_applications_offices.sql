@@ -2,7 +2,7 @@ with offices as (
     select * from {{ ref('offices') }}
 ),
 applications as (
-    select * from {{ source('staging', 'stg_applications') }}
+    select * from {{ ref('stg_applications') }}
 ),
 
 enriched as (

@@ -30,13 +30,12 @@ services:
   ingestion:
     container_name: bureau-ingestion      # fixed name for docker exec / logs
     build:
-      context: ./ingestion
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./ingestion/Dockerfile
     environment:
       <<: *gcp-env                        # merges the gcp-env block defined above
-      GCS_ZIP_URL: ${GCS_ZIP_URL}
-      DISPOSITION: ${DISPOSITION:-replace}
-      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
+      GCS_ZIP_URL: gs://${GCP_PROJECT}-xmls-bucket/xmls/bureau.zip
+      GCS_BUCKET_NAME: ${GCP_PROJECT}-xmls-bucket
       SECRETS_PATH: ${SECRETS_PATH}
     volumes:
       - ${CREDENTIALS_PATH}:/secrets/credentials.json:ro
@@ -51,8 +50,10 @@ services:
       dockerfile: Dockerfile
     environment:
       <<: *gcp-env
+      GCS_BUCKET_URI: gs://${GCP_PROJECT}-xmls-bucket
       DBT_PROFILES_DIR: /dbt
       DBT_PROJECT_DIR: /dbt
+
     volumes:
       - ${CREDENTIALS_PATH}:/secrets/credentials.json:ro
       - ./dbt:/dbt                        # live-mount — sql/yml edits work without rebuild

@@ -1,5 +1,5 @@
 with consultas as (
-    select * from {{ source('intermediate', 'inter_consultas') }}
+    select * from {{ ref('inter_consultas') }}
 ),
 
 aggregated as ( 

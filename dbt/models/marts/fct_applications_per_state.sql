@@ -1,5 +1,5 @@
 with source as (
-    select * from {{source('intermediate', 'inter_applications_offices')}}
+    select * from {{ref('inter_applications_offices')}}
 ),
 
 grouped as (

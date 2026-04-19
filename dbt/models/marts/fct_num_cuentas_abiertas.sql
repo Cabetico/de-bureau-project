@@ -1,5 +1,5 @@
 with cuentas as (
-    select * from {{ source('intermediate', 'inter_cuentas') }}
+    select * from {{ ref('inter_cuentas') }}
 ),
 
 aggregated as ( 

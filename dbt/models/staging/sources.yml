@@ -1,8 +1,6 @@
-version: 2
-
 sources: 
   - name: raw
-    database: dtc-de-340821
+    database: "{{ env_var('GCP_PROJECT') }}"
     schema: raw
     tables:
       - name: personas
@@ -15,32 +13,3 @@ sources:
         description: "table with the information of the credit inquiries of the borrower"
       - name: applications
         description: "table with the information of the credit applications of the borrower"
-  - name: staging
-    database: dtc-de-340821
-    schema: staging
-    tables:
-      - name: stg_cuentas
-        description: "intermediate table with the information of the accounts of the borrower, with the correct data types"
-      - name: stg_applications
-        description: "intermediate table with the information of the credit applications of the borrower, with the correct data types"
-      - name: stg_consultas
-        description: "intermediate table with the information of the credit inquiries of the borrower, with the correct data types"
-      - name: stg_domicilios
-        description: "intermediate table with the information of the addresses of the borrower, with the correct data types"
-      - name: stg_personas
-        description: "intermediate table with the demographic information of the borrower, with the correct data types"
-  - name: intermediate
-    database: dtc-de-340821
-    schema: intermediate
-    tables:
-      - name: inter_cuentas
-        description: "intermediate table with the information of the accounts of the borrower, enriched with the information of the credit applications"
-      - name: inter_applications
-        description: "intermediate table with the information of the credit applications of the borrower, with the correct data types"
-      - name: inter_consultas
-        description: "intermediate table with the information of the credit inquiries of the borrower, with the correct data types"
-      - name: inter_domicilios
-        description: "intermediate table with the information of the addresses of the borrower, with the correct data types"
-      - name: inter_personas
-        description: "intermediate table with the demographic information of the borrower, with the correct data types"
-      - name: inter_applications_offices

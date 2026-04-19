@@ -1,5 +1,5 @@
 with domicilios as (
-    select * from {{ source('intermediate', 'inter_domicilios') }}
+    select * from {{ ref('inter_domicilios') }}
 ),
 
 aggregated as ( 

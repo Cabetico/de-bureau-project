@@ -719,54 +719,54 @@ def main():
     import os
 
     parser = argparse.ArgumentParser(
-        description="Genera XMLs de prueba con formato Círculo de Crédito (México)"
+        description="Generates proof XMLs witho Círculo de Crédito (México Bureau) format"
     )
-    parser.add_argument("--cantidad",     "-n", type=int,  default=1,    help="Personas por XML (default: 1)")
-    parser.add_argument("--archivos",     "-a", type=int,  default=1,    help="Número de XMLs a generar (default: 1)")
-    parser.add_argument("--salida",       "-o", type=str,  default=None, help="Nombre base del archivo de salida")
-    parser.add_argument("--destino",      "-d", type=str,  default=None, help="Carpeta de destino (se crea si no existe)")
-    parser.add_argument("--seed",               type=int,  default=None, help="Semilla para reproducibilidad")
+    parser.add_argument("--qty",      "-n", type=int,  default=1,    help="Persons per XML (default: 1) diserible")
+    parser.add_argument("--files",    "-f", type=int,  default=1,    help="Quantity of XMLs to generate (default: 1)")
+    parser.add_argument("--output",   "-o", type=str,  default=None, help="Base name for output XML files (default: reporte_0001.xml, reporte_0002.xml, ...)")
+    parser.add_argument("--destination",  "-d", type=str,  default=None, help="Destination folder for XML files (default: current working directory)")
+    parser.add_argument("--seed",           type=int,  default=None, help="Semilla para reproducibilidad")
     # ── application records
     parser.add_argument("--applications",       type=str,  default=None,
                         help="Path to the JSON file for application records (e.g. applications.json)")
-    parser.add_argument("--fecha-inicio",       type=str,  default="2023-01-01",
-                        help="Fecha de inicio para solicitudes (YYYY-MM-DD, default: 2023-01-01)")
-    parser.add_argument("--fecha-fin",          type=str,  default="2023-12-31",
-                        help="Fecha de fin para solicitudes (YYYY-MM-DD, default: 2023-12-31)")
+    parser.add_argument("--start-date",       type=str,  default="2023-01-01",
+                        help="Start date for applications records (YYYY-MM-DD, default: 2023-01-01)")
+    parser.add_argument("--end-date",          type=str,  default="2023-12-31",
+                        help="End date for applications records (YYYY-MM-DD, default: 2023-12-31)")
     parser.add_argument("--offices",            type=str,  default=None,
                         help="Path to write the offices reference CSV (e.g. offices.csv)")
     # ── zip
     parser.add_argument("--zip",                type=str,  default=None,
-                        help="Empaqueta todos los XMLs generados en este archivo ZIP (ej: xmls.zip)")
+                        help="Path to the ZIP file to create (e.g. xmls.zip)")
     # ── gcs
     parser.add_argument("--gcs-bucket",         type=str,  default=None,
-                        help="Nombre del bucket GCS donde subir los XMLs y el CSV (eg: de-zoomcamp-project-xmls-bucket)")
+                        help="Name of the GCS bucket where XMLs and CSVs will be uploaded (e.g. de-zoomcamp-project-xmls-bucket)")
     parser.add_argument("--gcs-xml-prefix",     type=str,  default="xmls",
-                        help="Prefijo/carpeta dentro del bucket para los XMLs (default: xmls)")
+                        help="Prefix/folder within the bucket for the XMLs (default: xmls)")
     parser.add_argument("--gcs-csv-prefix",     type=str,  default="",
-                        help="Prefijo/carpeta dentro del bucket para el CSV (default: raíz del bucket)")
+                        help="Prefix/folder within the bucket for the CSV (default: root of the bucket)")
     parser.add_argument("--gcs-credentials",    type=str,  default=None,
-                        help="Ruta al JSON de cuenta de servicio GCP (ej: ~/.gcp/key.json). "
-                             "Si no se indica, se usa GOOGLE_APPLICATION_CREDENTIALS o gcloud ADC.")
+                        help="Credentials path (ej: ~/.gcp/key.json). "
+                             "if not specified,  GOOGLE_APPLICATION_CREDENTIALS or gcloud ADC are used.")
     parser.add_argument("--gcs-project",        type=str,  default=None,
-                        help="GCP project ID. Se infiere del JSON si no se indica.")
+                        help="GCP project ID. inferred from the JSON if not specified.")
     args = parser.parse_args()
 
     # ── resolve destination folder
-    if args.destino:
-        destino = os.path.abspath(args.destino)
-        os.makedirs(destino, exist_ok=True)
-        print(f"📁  Carpeta de destino : {destino}")
+    if args.destination:
+        destination = os.path.abspath(args.destination)
+        os.makedirs(destination, exist_ok=True)
+        print(f"📁  Destination folder : {destination}")
     else:
-        destino = os.getcwd()
+        destination = os.getcwd()
 
     if args.seed is not None:
         random.seed(args.seed)
         Faker.seed(args.seed)
 
     # ── parse date window
-    fecha_inicio = date.fromisoformat(args.fecha_inicio)
-    fecha_fin    = date.fromisoformat(args.fecha_fin)
+    fecha_inicio = date.fromisoformat(args.start_date)
+    fecha_fin    = date.fromisoformat(args.end_date)
 
     # ── generate offices CSV if requested
     if args.offices:
@@ -780,31 +780,31 @@ def main():
     zf_handle = zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED)                 if zip_path else None
 
     if zip_path:
-        print(f"🗜   ZIP en memoria       : {zip_path}")
+        print(f"🗜   ZIP in memory     : {zip_path}")
 
     try:
-        for i in range(1, args.archivos + 1):
-            personas    = [generar_persona() for _ in range(args.cantidad)]
+        for i in range(1, args.files + 1):
+            personas    = [generar_persona() for _ in range(args.qty)]
             xml_content = build_xml(personas)
 
             # ── build filename
-            if args.salida and args.archivos == 1:
-                nombre_base = args.salida if args.salida.endswith(".xml") else args.salida + ".xml"
-            elif args.salida:
-                nombre_base = f"{args.salida}_{i:04d}.xml"
+            if args.output and args.files == 1:
+                nombre_base = args.output if args.output.endswith(".xml") else args.output + ".xml"
+            elif args.output:
+                nombre_base = f"{args.output}_{i:04d}.xml"
             else:
                 nombre_base = f"reporte_{i:04d}.xml"
 
             if zf_handle:
                 # write directly into the ZIP — no file ever hits the filesystem
                 zf_handle.writestr(nombre_base, xml_content.encode("utf-8"))
-                print(f"  ✅  [{i:>5}/{args.archivos}] {nombre_base} → ZIP")
+                print(f"  ✅  [{i:>5}/{args.files}] {nombre_base} → ZIP")
             else:
                 # normal file write
-                ruta_completa = os.path.join(destino, nombre_base)
+                ruta_completa = os.path.join(destination, nombre_base)
                 with open(ruta_completa, "w", encoding="utf-8") as f:
                     f.write(xml_content)
-                print(f"  ✅  [{i:>5}/{args.archivos}] {ruta_completa}")
+                print(f"  ✅  [{i:>5}/{args.files}] {ruta_completa}")
 
             # ── application record — one per XML, linked to first persona's CURP
             if args.applications:
@@ -821,7 +821,7 @@ def main():
         if zf_handle:
             zf_handle.close()
             total_kb = os.path.getsize(zip_path) // 1024
-            print(f"\n🗜   ZIP cerrado           : {zip_path}  ({args.archivos} archivos, {total_kb} KB)")
+            print(f"\n🗜   ZIP closed           : {zip_path}  ({args.files} files, {total_kb} KB)")
 
     # ── save applications JSON
     if args.applications and applications:
@@ -852,7 +852,7 @@ def main():
             print("\n⚠️   google-cloud-storage not installed — skipping GCS upload.")
             print("    Run: pip install google-cloud-storage")
         else:
-            print(f"\n☁   Subiendo a gs://{args.gcs_bucket}/...")
+            print(f"\n☁   Uploading to gs://{args.gcs_bucket}/...")
             # ZIP (contains all XMLs — upload the single file instead of N individual files)
             if zip_path:
                 uri = upload_to_gcs(args.gcs_bucket, zip_path, args.gcs_xml_prefix, args.gcs_credentials, args.gcs_project)
@@ -867,9 +867,9 @@ def main():
                 offices_path_upload = os.path.abspath(args.offices)
                 uri = upload_to_gcs(args.gcs_bucket, offices_path_upload, args.gcs_csv_prefix, args.gcs_credentials, args.gcs_project)
                 print(f"  ☁   offices CSV → {uri}")
-            print("  ✅  Subida completada")
+            print("  ✅  upload to GCS complete.")
 
-    print("\nCatálogos utilizados:")
+    print("\nUsed Catalogs:")
     print(f"  TipoCredito     : {', '.join(TIPO_CREDITO.keys())}  ({', '.join(TIPO_CREDITO.values())})")
     print(f"  TipoCuenta      : {', '.join(TIPO_CUENTA.keys())}  ({', '.join(TIPO_CUENTA.values())})")
     print(f"  TipoResp.       : {', '.join(TIPO_RESPONSABILIDAD.keys())}  ({', '.join(TIPO_RESPONSABILIDAD.values())})")

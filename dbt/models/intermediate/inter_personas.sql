@@ -1,9 +1,9 @@
 with personas as (
-    select * from {{ source('staging', 'stg_personas') }}
+    select * from {{ ref('stg_personas') }}
 ),
 
 applications as (
-    select * from {{ source('staging', 'stg_applications') }}
+    select * from {{ ref('stg_applications') }}
 ),
 
 enriched as (

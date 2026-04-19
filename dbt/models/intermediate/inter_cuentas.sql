@@ -1,9 +1,9 @@
 with cuentas as (
-    select * from {{ source('staging', 'stg_cuentas') }}
+    select * from {{ ref('stg_cuentas') }}
 ),
 
 applications as (
-    select * from {{ source('staging', 'stg_applications') }}
+    select * from {{ ref('stg_applications') }}
 ),
 
 enriched as (

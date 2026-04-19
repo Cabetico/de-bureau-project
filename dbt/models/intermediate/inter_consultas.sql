@@ -1,8 +1,8 @@
 with consultas as (
-    select * from {{ source('staging', 'stg_consultas') }}
+    select * from {{ ref('stg_consultas') }}
 ),
 applications as (
-    select * from {{ source('staging', 'stg_applications') }}
+    select * from {{ ref('stg_applications') }}
 ),
 enriched as (
     select
