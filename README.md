@@ -339,6 +339,6 @@ Use the password defined in your `.env` (`STREAMLIT_PASSWORD`) to log in. 🎉
 **🗃️ Raw Data**
 ![Raw Data](img/raw_data.png)
 
-** 🚨🚨 Error ** 
+**🚨🚨 Error** 
 ![Tables Unavailable](img/error.png)
 Ensure the necessary tables are created to support the dashboard's data display.
